@@ -3,8 +3,8 @@ use crate::task::Task;
 use crate::robot::Robot;
 
 use rand::seq::SliceRandom;
-// use::std::thread;
-// use::std::time::Duration;
+use::std::thread;
+use::std::time::Duration;
 
 pub struct BotManager {
     bots: Vec<Robot>,
@@ -32,26 +32,13 @@ impl BotManager {
         self.bots.push(bot);
     }
 
-    pub fn display_bots(&self) {
-        let mut i = 0;
-
-        println!("\nBots:");
-        for bot in self.bots.iter() {
-            println!("{}) {} ({})", i, bot.get_name(), bot.get_type());
-            i += 1;
-        }
-        println!();
-    }
-
-    pub fn show_tasks(&self, bot: i32) {
-        self.bots[bot as usize].display_tasks();
+    pub fn get_bots(&self) -> &Vec<Robot> {
+        &self.bots
     }
 
     pub fn call_to_work(&mut self, bot: i32, task: i32){
-        // let mut bot = self.bots.remove(bot_at as usize);
-        // bot.complete_task(task);
-        // self.bots.insert(bot_at as usize, bot);
         self.bots[bot as usize].complete_task(task);
+        thread::sleep(Duration::from_millis(100)); // for output order
     }
 }
 

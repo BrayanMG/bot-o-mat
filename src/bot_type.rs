@@ -28,18 +28,3 @@ impl BotType {
         }
     }
 }
-
-pub fn from_str(val: &str) -> BotType {
-    match val {
-        "Unipedal" => BotType::Unipedal,
-        "Bipedal" => BotType::Bipedal,
-        "Quadrupedal" => BotType::Quadrupedal,
-        "Arachnid" => BotType::Arachnid,
-        "Radial" => BotType::Radial,
-        "Aeronautical" => BotType::Aeronautical,
-        _ => {
-            println!("\nEnter a valid type!\n");
-            BotType::Aeronautical
-        }
-    }
-}

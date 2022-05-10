@@ -55,7 +55,7 @@ impl Robot {
     }
 
     pub fn display_tasks(&self) {
-        let mut i = 0;
+        let mut i = 1;
 
         println!("\n{}'s Tasks:", self.name);
         for task in self.tasks.iter() {
@@ -63,6 +63,10 @@ impl Robot {
             i += 1;
         }
         println!();
+    }
+
+    pub fn get_num_tasks(&self) -> i32 {
+        self.tasks.len() as i32
     }
 
     pub fn get_name(&self) -> &str {
