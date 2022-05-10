@@ -1,5 +1,5 @@
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 
 pub struct Task {
     description: String,
@@ -14,10 +14,11 @@ impl Task {
         }
     }
 
-    pub fn make_copy(&self) -> Task {
-        Task{
-            description: self.description.clone(),
-            eta: self.eta
-        }
+    pub fn get_desc(&self) -> &str {
+        return self.description.as_str();
+    }
+
+    pub fn get_eta(&self) -> u32 {
+        return self.eta;
     }
 }

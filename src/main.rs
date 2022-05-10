@@ -3,55 +3,77 @@ mod task;
 mod bot_type;
 mod bot_manager;
 
-use crate::bot_type::BotType;
-use crate::robot::Robot;
+use crate::bot_type::{BotType, from_str};
+// use crate::robot::Robot;
+use crate::bot_manager::BotManager;
 
-use eframe::egui;
+// use::std::thread;
+use std::io::{self, Write, stdout, stdin};
+use::std::process::exit;
 
 fn main() {
-    let options = eframe::NativeOptions::default();
-    eframe::run_native(
-        "My Robot App",
-        options,
-        Box::new(|_cc| Box::new(MyApp::default())),
-    );
-}
+    let mut manager = BotManager::new();
+    let menu = "\nMain Menu\n---------\n0) Quit\n1) Create a Bot\n2) View Bots\n";
+    let mut choice = -1;
 
-struct MyApp {
-    name: String,
-    bot_type: BotType,
-}
+    loop {
+        println!("{}", menu);
+        choice = prompt_choice("Pick a menu option");
 
-impl Default for MyApp {
-    fn default() -> Self {
-        Self {
-            name: "Arthur".to_owned(),
-            bot_type: BotType::Aeronautical,
+        match choice {
+            0 => {
+                println!("\nGoodbye!\n");
+                exit(0);
+            },
+            1 => {
+                let name = get_user_input("Enter a bot name");
+                let bot_type = from_str(get_user_input("Enter a bot type").as_str());
+
+                manager.add_bot(name.as_str(), bot_type);
+            },
+            2 => {
+                manager.display_bots();
+                let bot = prompt_choice("Pick a Bot");
+
+                manager.show_tasks(bot);
+                let task = prompt_choice("Pick a Task");
+
+                manager.call_to_work(bot, task);
+            }
+            _ => {
+                while !(choice >= 0 && choice < 3) {
+                    println!("\nPick a valid menu option!\n");
+                    choice = prompt_choice("Pick a menu option");
+                }
+            }
         }
+        
     }
 }
 
-impl eframe::App for MyApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("Bot-O-Matic");
-            ui.horizontal(|ui| {
-                ui.label("Create a Robot: ");
-                ui.text_edit_singleline(&mut self.name);
-                egui::ComboBox::from_label("Select one!")
-                    .selected_text(format!("{:?}", self.bot_type))
-                    .show_ui(ui, |ui| {
-                        ui.selectable_value(&mut self.bot_type, BotType::Unipedal, "Unipedal");
-                        ui.selectable_value(&mut self.bot_type, BotType::Bipedal, "Bipedal");
-                        ui.selectable_value(&mut self.bot_type, BotType::Quadrupedal, "Quadrupedal");
-                    }
-                );
-            });
-            if ui.button("Create Robot").clicked() {
-                let bot = Robot::new(self.name.clone(), self.bot_type);
-                println!("{:?}", bot);
-            }
-            // ui.label(format!("Hello '{:?}'", bot));
-        });
+fn get_user_input(prompt: &str) -> String {
+    // Prompting user
+    print!("{} > ", prompt);
+    stdout().flush().expect("Failed to flush stdout");
+
+    // To obtain user input, we need to allocate space for the input first
+    let mut buffer = String::new();
+
+    // Now we are locking `stdin` and rerouting its input to a variable
+    stdin().read_line(&mut buffer).expect("Failed to read user input");
+
+    // Trimming white space and returning the string
+    buffer.trim().to_string()
+}
+
+fn prompt_choice(prompt: &str) -> i32 {
+    let val = get_user_input(prompt);
+
+    match val.parse::<i32>() {
+        Ok(num) => num,
+        Err(_) => {
+            println!("\nError: entered an invalid number.\n");
+            prompt_choice(prompt)
+        }
     }
 }

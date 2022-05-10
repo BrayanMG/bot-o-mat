@@ -3,6 +3,8 @@ use crate::task::Task;
 use crate::robot::Robot;
 
 use rand::seq::SliceRandom;
+// use::std::thread;
+// use::std::time::Duration;
 
 pub struct BotManager {
     bots: Vec<Robot>,
@@ -17,17 +19,39 @@ impl BotManager {
         }
     }
 
-    pub fn add_bot(&mut self, name: String, bot_type: BotType) {
-        let mut bot = Robot::new(name, bot_type);
+    pub fn add_bot(&mut self, name: &str, bot_type: BotType) {
+        let mut bot = Robot::new(String::from(name), bot_type);
 
         let mut random = rand::thread_rng();
         self.tasks.shuffle(&mut random);
 
         for i in 0..5 {
-            bot.assign_task(self.tasks.get(i).unwrap().make_copy());
+            bot.assign_task(self.tasks.get(i).unwrap().clone());
         }
     
         self.bots.push(bot);
+    }
+
+    pub fn display_bots(&self) {
+        let mut i = 0;
+
+        println!("\nBots:");
+        for bot in self.bots.iter() {
+            println!("{}) {} ({})", i, bot.get_name(), bot.get_type());
+            i += 1;
+        }
+        println!();
+    }
+
+    pub fn show_tasks(&self, bot: i32) {
+        self.bots[bot as usize].display_tasks();
+    }
+
+    pub fn call_to_work(&mut self, bot: i32, task: i32){
+        // let mut bot = self.bots.remove(bot_at as usize);
+        // bot.complete_task(task);
+        // self.bots.insert(bot_at as usize, bot);
+        self.bots[bot as usize].complete_task(task);
     }
 }
 
